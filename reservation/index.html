@@ -33,6 +33,8 @@
 
   .form-wrapper { max-width:640px; margin:0 auto; padding:48px 24px 80px; }
 
+  .form-intro { background:var(--noir-card); border:1px solid rgba(201,168,76,0.25); border-left:3px solid var(--or); padding:18px 22px; margin-bottom:40px; font-size:12px; color:rgba(232,201,106,0.9); line-height:1.7; letter-spacing:0.3px; }
+
   .form-section { margin-bottom:48px; }
   .section-label { font-size:9px; letter-spacing:5px; text-transform:uppercase; color:var(--or); margin-bottom:6px; display:block; }
   .section-title { font-family:"Cormorant Garamond",serif; font-size:22px; font-weight:300; letter-spacing:2px; color:var(--blanc); margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid rgba(201,168,76,0.15); }
@@ -113,6 +115,8 @@
 <div class="form-wrapper">
   <form id="reservationForm" novalidate>
 
+    <p class="form-intro">Ce formulaire ne constitue pas une réservation définitive. Après réception de votre demande, nous vous recontacterons sous 48h pour échanger sur votre projet et personnaliser votre prestation selon vos souhaits.</p>
+
     <!-- SECTION 1 -->
     <div class="form-section">
       <span class="section-label">01</span>
@@ -129,6 +133,27 @@
         <div class="field">
           <label class="field-label">Téléphone <span>*</span></label>
           <input type="tel" id="f_tel" placeholder="06 00 00 00 00">
+        </div>
+      </div>
+      <div class="field" id="field_rappel">
+        <label class="field-label">Quand souhaitez-vous être recontacté ? <span>*</span></label>
+        <div class="radio-group">
+          <div class="radio-option" data-group="rappel" data-value="Matin (9h-12h)" onclick="selectRadio(this)">
+            <span class="radio-box"></span>
+            <span class="option-text">Matin (9h-12h)</span>
+          </div>
+          <div class="radio-option" data-group="rappel" data-value="Après-midi (14h-18h)" onclick="selectRadio(this)">
+            <span class="radio-box"></span>
+            <span class="option-text">Après-midi (14h-18h)</span>
+          </div>
+          <div class="radio-option" data-group="rappel" data-value="Soir (18h-20h)" onclick="selectRadio(this)">
+            <span class="radio-box"></span>
+            <span class="option-text">Soir (18h-20h)</span>
+          </div>
+          <div class="radio-option" data-group="rappel" data-value="Je préfère être contacté par mail" onclick="selectRadio(this)">
+            <span class="radio-box"></span>
+            <span class="option-text">Je préfère être contacté par mail</span>
+          </div>
         </div>
       </div>
     </div>
@@ -299,7 +324,7 @@
     </div>
 
     <div class="submit-zone">
-      <p class="submit-note">En soumettant ce formulaire, vous acceptez d'être recontacté par JL FLASH dans un délai de 24 heures. Aucun engagement de votre part à ce stade.</p>
+      <p class="submit-note">En soumettant ce formulaire, vous acceptez d'être recontacté par JL FLASH dans un délai de 48h. Aucun engagement de votre part à ce stade.</p>
       <button type="button" id="btnSubmit" class="btn-submit">Envoyer ma demande</button>
     </div>
 
@@ -315,7 +340,7 @@
       </svg>
     </div>
     <h2 class="success-title">Demande envoyée</h2>
-    <p class="success-text">Merci pour votre confiance.<br>Nous reviendrons vers vous dans les 24 heures avec un devis personnalisé.</p>
+    <p class="success-text">Nous vous recontacterons dans les 48h pour échanger sur votre événement.</p>
   </div>
 </div>
 
@@ -330,6 +355,7 @@ var selectedFormule = "";
 var selectedHeures = "";
 var selectedEmplacement = "";
 var selectedElectricite = "";
+var selectedRappel = "";
 
 // ── Sélection formule ──
 function selectFormule(card) {
@@ -356,6 +382,11 @@ function selectRadio(el) {
     selectedElectricite = el.getAttribute("data-value");
     var err2 = document.querySelector("#field_electricite .error-msg");
     if (err2) err2.remove();
+  }
+  if (group === "rappel") {
+    selectedRappel = el.getAttribute("data-value");
+    var err3 = document.querySelector("#field_rappel .error-msg");
+    if (err3) err3.remove();
   }
 }
 
@@ -406,6 +437,7 @@ document.getElementById("btnSubmit").addEventListener("click", function() {
   if (!nom) { showError(document.getElementById("f_nom").parentNode, "Ce champ est obligatoire."); ok = false; return; }
   if (!email) { showError(document.getElementById("f_email").parentNode, "Ce champ est obligatoire."); ok = false; return; }
   if (!tel) { showError(document.getElementById("f_tel").parentNode, "Ce champ est obligatoire."); ok = false; return; }
+  if (!selectedRappel) { showError(document.getElementById("field_rappel"), "Merci d'indiquer quand vous souhaitez être recontacté."); ok = false; return; }
   if (!type) { showError(document.getElementById("f_type").parentNode, "Merci de sélectionner un type d'événement."); ok = false; return; }
   if (!date) { showError(document.getElementById("f_date").parentNode, "Merci d'indiquer la date de votre événement."); ok = false; return; }
   if (!heure) { showError(document.getElementById("f_heure").parentNode, "Merci d'indiquer l'heure de début."); ok = false; return; }
@@ -450,6 +482,7 @@ document.getElementById("btnSubmit").addEventListener("click", function() {
     client_nom: nom,
     client_email: email,
     client_tel: tel,
+    creneau_rappel: selectedRappel,
     type_evenement: type,
     date_evenement: dateFormatee,
     heure_debut: heure,
